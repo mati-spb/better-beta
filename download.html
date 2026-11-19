@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>better לאנדרואיד</title>
+<meta name="description" content="better: פחות מסך. יותר חיים. זמן איכות עם המשפחה ונהיגה בטוחה יותר, באופן אוטומטי לגמרי.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F4F6FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B0F17" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" href="icons/favicon-48.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Outfit:wght@700&display=swap" rel="stylesheet">
+<style>
+  /* 4.5.0: one phone screen, benefits only (the owner's text). Everything technical lives in the app's setup wizard.
+     Bilingual (HE | EN, better.lang like the app) and platform aware: Android and desktop get the APK, iPhone and iPad
+     get the web app in Safari with a two-step "Add to Home Screen" guide. Every combination fits one screen. */
+  :root {
+    --bg: #F4F6FA; --card: rgba(255,255,255,.9); --ink: #0F172A; --mute: #5B6B82; --line: rgba(15,23,42,.08);
+    --accent: #059669; --accent-on: #FFFFFF; --num: rgba(16,185,129,.16); --num-ink: #047857;
+    --glow-a: rgba(16,185,129,.18); --glow-b: rgba(59,130,246,.13); --btn-shadow: rgba(5,150,105,.32);
+    --icon-shadow: drop-shadow(0 10px 22px rgba(15,23,42,.24));
+    --chip: rgba(255,255,255,.75); --ios-bg: rgba(59,130,246,.13); --ios-ink: #2563EB;
+    --note-bg: rgba(245,158,11,.14); --note-ink: #92400E; --focus: #3B82F6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0B0F17; --card: #151C28; --ink: #E8EEF6; --mute: #8B98AE; --line: rgba(255,255,255,.07);
+      --accent: #10B981; --accent-on: #03130D; --num: rgba(16,185,129,.18); --num-ink: #34D399;
+      --glow-a: rgba(16,185,129,.13); --glow-b: rgba(59,130,246,.13); --btn-shadow: rgba(16,185,129,.24);
+      --icon-shadow: drop-shadow(0 0 1px rgba(255,255,255,.22)) drop-shadow(0 10px 24px rgba(0,0,0,.5));
+      --chip: rgba(255,255,255,.06); --ios-bg: rgba(96,165,250,.16); --ios-ink: #60A5FA;
+      --note-bg: rgba(245,158,11,.15); --note-ink: #FBBF24; --focus: #60A5FA; }
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--ink); font: 400 15px/1.5 Heebo, system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(70% 45% at 85% 0%, var(--glow-a), transparent 70%),
+                      radial-gradient(60% 40% at 0% 100%, var(--glow-b), transparent 70%);
+    background-attachment: fixed;
+  }
+  main {
+    position: relative; max-width: 440px; min-height: 100vh; min-height: 100svh; margin: 0 auto; display: flex; flex-direction: column; justify-content: center;
+    padding: max(18px, env(safe-area-inset-top)) 18px max(14px, env(safe-area-inset-bottom));
+  }
+  a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  /* HE | EN in the top corner: the end side, so top-left in Hebrew and top-right in English */
+  .lang { position: absolute; top: max(12px, env(safe-area-inset-top)); inset-inline-end: 12px; z-index: 1;
+    padding: 3px; border-radius: 999px; background: var(--chip); border: 1px solid var(--line); }
+  .lang-in { display: flex; gap: 2px; }
+  .lang button { appearance: none; -webkit-appearance: none; border: 0; margin: 0; background: transparent; color: var(--mute); cursor: pointer;
+    min-width: 40px; height: 28px; padding: 0 10px; border-radius: 999px; font: 700 12.5px/28px Outfit, sans-serif; letter-spacing: .03em; }
+  .lang button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+  .head { text-align: center; }
+  .head img { display: block; width: 64px; height: 64px; margin: 0 auto; filter: var(--icon-shadow); }
+  .brand { font: 700 34px/1 Outfit, sans-serif; letter-spacing: -.04em; direction: ltr; unicode-bidi: isolate; display: inline-block;
+    margin: 10px 0 0; padding-bottom: .06em;
+    background: linear-gradient(90deg, var(--ink) 0%, var(--ink) 63%, #10B981 74%, #3B82F6 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+  .sub { color: var(--mute); font-weight: 700; font-size: 15px; margin: 4px 0 0; }
+  .value { font: 800 19px/1.45 Heebo, sans-serif; text-align: center; margin: 16px auto 0; max-width: 30ch; text-wrap: balance; }
+  .btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 56px; margin-top: 18px; border-radius: 999px;
+    background: var(--accent); color: var(--accent-on); font: 800 18px Heebo, sans-serif; text-decoration: none; text-align: center;
+    padding: 0 16px; box-shadow: 0 10px 24px var(--btn-shadow); }
+  .btn:active { transform: scale(.985); }
+  /* iPhone / iPad: the web app in Safari, then "Add to Home Screen" */
+  .ios { margin-top: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 22px; padding: 12px 14px 14px; }
+  .note { margin: 0 0 10px; padding: 7px 11px; border-radius: 12px; background: var(--note-bg); color: var(--note-ink);
+    font: 700 13.5px/1.4 Heebo, sans-serif; text-align: center; }
+  .ios h2 { margin: 0; text-align: center; }
+  .ios .btn { margin-top: 10px; }
+  .guide { list-style: none; margin: 12px 0 0; padding: 0; counter-reset: g; display: grid; gap: 8px; }
+  .guide li { counter-increment: g; display: flex; gap: 11px; align-items: center; font-size: 14px; line-height: 1.4; }
+  .gi { position: relative; flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px;
+    background: var(--ios-bg); color: var(--ios-ink); }
+  .gi svg { display: block; width: 19px; height: 19px; }
+  .gi::after { content: counter(g); position: absolute; top: -5px; inset-inline-start: -5px; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--ink); color: var(--bg); font: 700 10px/16px Outfit, sans-serif; text-align: center; }
+  .gains { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 8px; }
+  .gains li { display: flex; gap: 10px; align-items: flex-start; background: var(--card); border: 1px solid var(--line); border-radius: 18px;
+    padding: 11px 13px; font-size: 14.5px; line-height: 1.45; }
+  .gains .e { flex: none; font-size: 19px; line-height: 1.2; }
+  .gains b { font-weight: 800; }
+  .gains li, .guide li, .steps li { text-wrap: pretty; }
+  h2 { font: 800 15.5px/1.3 Heebo, sans-serif; margin: 16px 0 8px; }
+  .how { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 16px 0 8px; }
+  .how h2 { margin: 0; }
+  .plat { flex: none; color: var(--mute); font: 700 12.5px/1.3 Heebo, sans-serif; text-decoration: underline; text-underline-offset: 3px;
+    padding: 5px 0; margin: -5px 0; }
+  .steps { list-style: none; margin: 0; padding: 0; counter-reset: s; display: grid; gap: 6px; }
+  .steps li { counter-increment: s; display: flex; gap: 10px; align-items: center; font-size: 14.5px; line-height: 1.4; }
+  .steps li::before { content: counter(s); flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--num); color: var(--num-ink);
+    font: 700 13px/24px Outfit, sans-serif; text-align: center; }
+  footer { text-align: center; color: var(--mute); font: 500 10px Outfit, sans-serif; letter-spacing: .03em; margin-top: 14px; direction: ltr; opacity: .8; }
+  /* short screens (small phones with the browser bars): the same page, tighter, so it still needs no scrolling */
+  @media (max-height: 740px) {
+    main { padding-top: max(12px, env(safe-area-inset-top)); padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+    .lang { top: max(8px, env(safe-area-inset-top)); }
+    .head img { width: 48px; height: 48px; }
+    .brand { font-size: 28px; margin-top: 6px; }
+    .sub { font-size: 14px; margin-top: 2px; }
+    .value { font-size: 17px; line-height: 1.4; margin-top: 10px; }
+    .btn { min-height: 50px; margin-top: 12px; font-size: 17px; }
+    .ios { margin-top: 12px; padding: 10px 12px 11px; border-radius: 20px; }
+    .note { margin-bottom: 8px; padding: 6px 10px; font-size: 12.5px; }
+    .ios .btn { min-height: 46px; margin-top: 8px; }
+    .guide { margin-top: 9px; gap: 6px; }
+    .guide li { font-size: 13px; line-height: 1.35; gap: 10px; }
+    .gi { width: 28px; height: 28px; border-radius: 9px; }
+    .gi svg { width: 17px; height: 17px; }
+    .gains { margin-top: 12px; gap: 6px; }
+    .gains li { padding: 8px 12px; font-size: 13.5px; line-height: 1.4; }
+    .gains .e { font-size: 17px; }
+    h2 { font-size: 14.5px; margin: 12px 0 6px; }
+    .how { margin: 12px 0 6px; }
+    .plat { font-size: 12px; }
+    .steps { gap: 4px; }
+    .steps li { font-size: 13.5px; line-height: 1.35; }
+    .steps li::before { width: 22px; height: 22px; font-size: 12px; line-height: 22px; }
+    footer { margin-top: 10px; }
+  }
+  /* the iPhone card makes the page about 100px longer, so up to 860px tall the iPhone view takes the short-screen sizes too */
+  @media (min-height: 741px) and (max-height: 860px) {
+    .is-ios main { padding-top: max(12px, env(safe-area-inset-top)); padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+    .is-ios .lang { top: max(8px, env(safe-area-inset-top)); }
+    .is-ios .head img { width: 48px; height: 48px; }
+    .is-ios .brand { font-size: 28px; margin-top: 6px; }
+    .is-ios .sub { font-size: 14px; margin-top: 2px; }
+    .is-ios .value { font-size: 17px; line-height: 1.4; margin-top: 10px; }
+    .is-ios .ios { margin-top: 12px; padding: 10px 12px 11px; border-radius: 20px; }
+    .is-ios .ios .btn { min-height: 48px; margin-top: 8px; font-size: 17px; }
+    .is-ios .guide { margin-top: 9px; gap: 6px; }
+    .is-ios .guide li { font-size: 13.5px; line-height: 1.35; }
+    .is-ios .gi { width: 28px; height: 28px; border-radius: 9px; }
+    .is-ios .gi svg { width: 17px; height: 17px; }
+    .is-ios .gains { margin-top: 12px; gap: 6px; }
+    .is-ios .gains li { padding: 8px 12px; font-size: 13.5px; line-height: 1.4; }
+    .is-ios .gains .e { font-size: 17px; }
+    .is-ios h2 { font-size: 14.5px; }
+    .is-ios .how { margin: 12px 0 6px; }
+    .is-ios .steps { gap: 4px; }
+    .is-ios .steps li { font-size: 13.5px; line-height: 1.35; }
+    .is-ios .steps li::before { width: 22px; height: 22px; font-size: 12px; line-height: 22px; }
+    .is-ios footer { margin-top: 10px; }
+  }
+  @media (max-height: 860px) {
+    .is-ios .value { max-width: 36ch; }
+    .is-ios .note { padding: 5px 8px; font-size: 12px; }
+  }
+  /* and on short screens it takes its room from the header and the gaps */
+  @media (max-height: 700px) {
+    .is-ios .head img { width: 36px; height: 36px; }
+    .is-ios .brand { font-size: 24px; margin-top: 3px; }
+    .is-ios .sub { font-size: 13px; margin-top: 0; }
+    .is-ios .value { font-size: 15.5px; line-height: 1.35; margin-top: 7px; }
+    .is-ios .ios { margin-top: 9px; padding: 9px 12px 10px; }
+    .is-ios .guide { gap: 5px; }
+    .is-ios .gains { margin-top: 9px; gap: 5px; }
+    .is-ios .gains li { padding: 5px 11px; font-size: 13px; line-height: 1.35; }
+    .is-ios .how { margin: 9px 0 5px; }
+    .is-ios .steps { gap: 3px; }
+    .is-ios .steps li { font-size: 13px; line-height: 1.3; }
+    .is-ios .steps li::before { width: 18px; height: 18px; font-size: 10.5px; line-height: 18px; }
+    .is-ios footer { margin-top: 7px; }
+  }
+  /* the shortest screens (360x640 and smaller): the iPhone header becomes one row at the start side, the icon beside the
+     wordmark and the slogan, clear of the language switch at the end side */
+  @media (max-height: 650px) {
+    .is-ios .head { display: grid; grid-template-columns: auto auto; justify-content: start; align-items: center; column-gap: 10px; text-align: start; }
+    .is-ios .head img { grid-row: 1 / span 2; width: 40px; height: 40px; margin: 0; }
+    .is-ios .brand { justify-self: start; align-self: end; margin: 0; font-size: 24px; }
+    .is-ios .sub { align-self: start; }
+  }
+  /* the very shortest (iPhone SE in Safari about 375x548, in-app browsers about 375x560, small Android 360x592): every
+     view and both languages take the tightest sizes (the iPhone view keeps its one-row header from the 650px tier) */
+  @media (max-height: 620px) {
+    main { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+    .lang { top: max(6px, env(safe-area-inset-top)); }
+    .head img { width: 36px; height: 36px; }
+    .brand { font-size: 24px; margin-top: 3px; }
+    .sub { font-size: 12.5px; margin: 0; }
+    .is-ios .head img { width: 36px; height: 36px; }
+    .is-ios .brand { font-size: 22px; margin: 0; }
+    .value { font-size: 14.5px; line-height: 1.32; margin-top: 6px; max-width: 40ch; }
+    .btn { min-height: 44px; margin-top: 8px; font-size: 16px; }
+    .ios { margin-top: 7px; padding: 7px 10px 8px; border-radius: 16px; }
+    .ios .btn, .is-ios .ios .btn { min-height: 40px; margin-top: 6px; font-size: 15.5px; }
+    .note, .is-ios .note { margin-bottom: 5px; padding: 4px 8px; font-size: 11.5px; line-height: 1.3; }
+    .ios h2 { font-size: 14px; }
+    .guide, .is-ios .guide { margin-top: 6px; gap: 4px; }
+    .guide li, .is-ios .guide li { font-size: 12.5px; line-height: 1.3; gap: 8px; }
+    .gi, .is-ios .gi { width: 24px; height: 24px; border-radius: 8px; }
+    .gi svg, .is-ios .gi svg { width: 15px; height: 15px; }
+    .gains, .is-ios .gains { margin-top: 7px; gap: 4px; }
+    .gains li, .is-ios .gains li { padding: 5px 10px; font-size: 12.5px; line-height: 1.32; border-radius: 14px; }
+    .gains .e { font-size: 15px; }
+    h2, .is-ios h2 { font-size: 13.5px; }
+    .how, .is-ios .how { margin: 7px 0 4px; }
+    .steps, .is-ios .steps { gap: 2px; }
+    .steps li, .is-ios .steps li { font-size: 12.5px; line-height: 1.28; gap: 8px; }
+    .steps li::before, .is-ios .steps li::before { width: 18px; height: 18px; font-size: 10.5px; line-height: 18px; }
+    footer, .is-ios footer { margin-top: 5px; }
+  }
+  @media (max-height: 560px) {
+    .value { font-size: 14px; margin-top: 4px; }
+    .gains li, .is-ios .gains li { padding: 4px 9px; font-size: 12px; }
+    .ios .btn, .is-ios .ios .btn { min-height: 38px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="lang" id="lang" role="group" aria-label="שפה">
+    <span class="lang-in" dir="ltr"><button type="button" data-lang="he" lang="he" title="עברית" aria-pressed="true">HE</button><button type="button" data-lang="en" lang="en" title="English" aria-pressed="false">EN</button></span>
+  </div>
+
+  <div class="head">
+    <img src="icons/icon-192.png" alt="" width="64" height="64">
+    <div class="brand">better</div>
+    <p class="sub" data-t="sub">פחות מסך. יותר חיים.</p>
+  </div>
+
+  <p class="value" data-t="value">להיות באמת עם המשפחה והילדים בבית, ולנהוג בראש שקט ובטוח יותר בכביש — באופן אוטומטי לגמרי.</p>
+
+  <a class="btn" id="apk" href="better.apk?v=2.6.0" download="better.apk" data-t="apk">הורדת האפליקציה לאנדרואיד ↓</a>
+
+  <section class="ios" id="ios" aria-labelledby="ios-h" hidden>
+    <p class="note" id="inapp" data-t="inapp" hidden>פותחים את הקישור ב־Safari (⋯ ← פתיחה בדפדפן)</p>
+    <h2 id="ios-h" data-t="iosTitle">התקנה לאייפון</h2>
+    <a class="btn" id="openApp" href="./" data-t="safari">פתיחת האפליקציה ב־Safari</a>
+    <ol class="guide">
+      <li><span class="gi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M8.5 9.5H7.5a2 2 0 0 0-2 2V19a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-7.5a2 2 0 0 0-2-2h-1"/><path d="M12 14.5V3"/><path d="M8.5 6.5 12 3l3.5 3.5"/></svg></span><span id="guide1" data-t="guide1">לוחצים על כפתור השיתוף בתחתית Safari</span></li>
+      <li><span class="gi" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg></span><span data-t="guide2">בוחרים „הוספה למסך הבית”, ואז פותחים את better ממסך הבית</span></li>
+    </ol>
+  </section>
+
+  <ul class="gains">
+    <li><span class="e" aria-hidden="true">🏠</span><span><b>זמן איכות עם המשפחה והילדים:</b> מניחים את הטלפון בצד וצוברים דירוג ונקודות על זמן נקי בבית.</span></li>
+    <li><span class="e" aria-hidden="true">🚗</span><span><b>נהיגה בטוחה יותר:</b> זיהוי נסיעה אוטומטי שמתגמל אתכם על כל נסיעה ללא מגע במסך.</span></li>
+  </ul>
+
+  <div class="how">
+    <h2 data-t="how">איך מתחילים?</h2>
+    <a class="plat" id="plat" href="#iphone">יש לך אייפון?</a>
+  </div>
+  <ol class="steps" id="steps">
+    <li>לוחצים על כפתור ההורדה ומתקינים את האפליקציה.</li>
+    <li>מתחברים בלחיצה אחת עם חשבון Google.</li>
+    <li>מאשרים את ההרשאות באשף הקצר שבתוך האפליקציה.</li>
+  </ol>
+
+  <footer>© 2026 Mati Primovitz · All rights reserved</footer>
+</main>
+<script>
+(function () {
+  'use strict';
+  /* every text of the page, in both languages (Hebrew is the default and is also the markup above) */
+  var TEXT = {
+    he: {
+      title: { android: 'better לאנדרואיד', ios: 'better לאייפון' },
+      desc: 'better: פחות מסך. יותר חיים. זמן איכות עם המשפחה ונהיגה בטוחה יותר, באופן אוטומטי לגמרי.',
+      langLabel: 'שפה',
+      sub: 'פחות מסך. יותר חיים.',
+      value: 'להיות באמת עם המשפחה והילדים בבית, ולנהוג בראש שקט ובטוח יותר בכביש — באופן אוטומטי לגמרי.',
+      apk: 'הורדת האפליקציה לאנדרואיד ↓',
+      inapp: 'פותחים את הקישור ב־Safari (⋯ ← פתיחה בדפדפן)',
+      iosTitle: 'התקנה לאייפון',
+      safari: 'פתיחת האפליקציה ב־Safari',
+      guide1: 'לוחצים על כפתור השיתוף בתחתית Safari',
+      guide1Other: 'לוחצים על כפתור השיתוף שליד שורת הכתובת',
+      openOther: 'פתיחת האפליקציה',
+      guide2: 'בוחרים „הוספה למסך הבית”, ואז פותחים את better ממסך הבית',
+      gains: [
+        ['זמן איכות עם המשפחה והילדים:', 'מניחים את הטלפון בצד וצוברים דירוג ונקודות על זמן נקי בבית.'],
+        ['נהיגה בטוחה יותר:', 'זיהוי נסיעה אוטומטי שמתגמל אתכם על כל נסיעה ללא מגע במסך.'],
+      ],
+      how: 'איך מתחילים?',
+      steps: {
+        android: ['לוחצים על כפתור ההורדה ומתקינים את האפליקציה.', 'מתחברים בלחיצה אחת עם חשבון Google.', 'מאשרים את ההרשאות באשף הקצר שבתוך האפליקציה.'],
+        ios: ['פותחים את הקישור ב־Safari.', 'מוסיפים את better למסך הבית.', 'מתחברים בלחיצה אחת עם חשבון Google.'],
+        iosOther: ['פותחים את האפליקציה בדפדפן הזה.', 'מוסיפים את better למסך הבית.', 'מתחברים בלחיצה אחת עם חשבון Google.'],
+      },
+      toIos: 'יש לך אייפון?',
+      toAndroid: 'יש לך אנדרואיד?',
+    },
+    en: {
+      title: { android: 'better for Android', ios: 'better for iPhone' },
+      desc: 'better: Less screen. More life. Quality time with family and safer driving, completely automatically.',
+      langLabel: 'Language',
+      sub: 'Less screen. More life.',
+      value: 'Be truly present with your family and kids at home, and drive with a calm, safer mind — completely automatically.',
+      apk: 'Download for Android ↓',
+      inapp: 'Open in Safari first (⋯ → Open in browser)',
+      iosTitle: 'Install on iPhone',
+      safari: 'Open the app in Safari',
+      guide1: 'Tap the Share button at the bottom of Safari',
+      guide1Other: 'Tap the Share button next to the address bar',
+      openOther: 'Open the app',
+      guide2: 'Choose “Add to Home Screen”, then open better from your Home Screen',
+      gains: [
+        ['Quality time with family and kids:', 'put the phone aside and earn rank and points for clean time at home.'],
+        ['Safer driving:', 'automatic drive detection that rewards you for every trip without touching the screen.'],
+      ],
+      how: 'How to start?',
+      steps: {
+        android: ['Tap the download button and install the app.', 'Sign in with one tap using your Google account.', 'Approve the permissions in the short in-⁠app wizard.'],
+        ios: ['Open this link in Safari.', 'Add better to your Home Screen.', 'Sign in with one tap using your Google account.'],
+        iosOther: ['Open the app in this browser.', 'Add better to your Home Screen.', 'Sign in with one tap using your Google account.'],
+      },
+      toIos: 'On iPhone?',
+      toAndroid: 'On Android?',
+    },
+  };
+
+  /* the language: better.lang, the same key the app uses on this site. Default Hebrew. */
+  var LANG_KEY = 'better.lang';
+  function loadLang() {
+    try { var v = window.localStorage.getItem(LANG_KEY); return v === 'en' || v === 'he' ? v : 'he'; } catch (e) { return 'he'; }
+  }
+  function saveLang(v) { try { window.localStorage.setItem(LANG_KEY, v); } catch (e) { /* private mode: this visit only */ } }
+
+  /* the device: Android, iPhone / iPad (iPadOS reports a Mac with touch) or anything else (desktop) */
+  var nav = window.navigator || {};
+  var ua = String(nav.userAgent || '');
+  function detectDevice() {
+    var uad = nav.userAgentData;
+    if (uad && typeof uad.platform === 'string' && /android/i.test(uad.platform)) return 'android';
+    if (/Android/i.test(ua)) return 'android';
+    if (/iPhone|iPad|iPod/.test(ua) || (nav.platform === 'MacIntel' && nav.maxTouchPoints > 1)) return 'ios';
+    return 'desktop';
+  }
+  var device = detectDevice();
+  /* on iPhone, "Add to Home Screen" needs a real browser: in-app viewers (WhatsApp, Instagram, Facebook, the Google app,
+     LINE, Snapchat, LinkedIn, WeChat, or any WebView without the Safari token) get the "open in Safari" line, and their
+     button opens Safari itself where iOS supports it (x-safari-https, iOS 17+). Chrome, Firefox, Edge and Opera on iPhone
+     are real browsers: since iOS 16.4 they add to the Home Screen from their own Share menu (next to the address bar),
+     so they get no note and their own wording (review 2026-11-18). */
+  var otherBrowser = device === 'ios' && /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  var inApp = device === 'ios' && nav.standalone !== true && !otherBrowser
+    && (/FBAN|FBAV|FB_IAB|Instagram|WhatsApp|GSA\/|Line\/|Snapchat|LinkedInApp|MicroMessenger/.test(ua) || !/Safari\//.test(ua));
+  var appUrl = new URL('./', window.location.href).href;
+  /* the view: iPhone on iOS, Android elsewhere; the small link (#iphone / #android) lets anyone pick the other one */
+  function currentView() {
+    var h = String(window.location.hash || '').toLowerCase();
+    if (h === '#iphone' || h === '#ios') return 'ios';
+    if (h === '#android') return 'android';
+    return device === 'ios' ? 'ios' : 'android';
+  }
+
+  var lang = loadLang();
+  var root = document.documentElement;
+  var $ = function (id) { return document.getElementById(id); };
+  var meta = document.querySelector('meta[name="description"]');
+
+  function render() {
+    var d = TEXT[lang];
+    var view = currentView();
+    var ios = view === 'ios';
+    root.setAttribute('lang', lang);
+    root.setAttribute('dir', lang === 'en' ? 'ltr' : 'rtl');
+    root.classList.toggle('is-ios', ios);
+    document.title = d.title[view];
+    if (meta) meta.setAttribute('content', d.desc);
+    var els = document.querySelectorAll('[data-t]');
+    for (var i = 0; i < els.length; i++) els[i].textContent = d[els[i].getAttribute('data-t')];
+    if (ios && otherBrowser) { $('openApp').textContent = d.openOther; $('guide1').textContent = d.guide1Other; }
+    $('openApp').setAttribute('href', ios && inApp && /^https:/.test(appUrl) ? 'x-safari-' + appUrl : './');
+    var gains = document.querySelectorAll('.gains li');
+    for (var g = 0; g < gains.length; g++) {
+      var span = gains[g].lastElementChild;
+      var b = document.createElement('b');
+      b.textContent = d.gains[g][0];
+      while (span.firstChild) span.removeChild(span.firstChild);
+      span.appendChild(b);
+      span.appendChild(document.createTextNode(' ' + d.gains[g][1]));
+    }
+    var steps = $('steps').children;
+    var list = ios && otherBrowser ? d.steps.iosOther : d.steps[view];
+    for (var s = 0; s < steps.length; s++) steps[s].textContent = list[s];
+    $('apk').hidden = ios;
+    $('ios').hidden = !ios;
+    $('inapp').hidden = !(ios && inApp);
+    var plat = $('plat');
+    plat.setAttribute('href', ios ? '#android' : '#iphone');
+    plat.textContent = ios ? d.toAndroid : d.toIos;
+    var group = $('lang');
+    group.setAttribute('aria-label', d.langLabel);
+    var btns = group.querySelectorAll('button');
+    for (var k = 0; k < btns.length; k++) btns[k].setAttribute('aria-pressed', String(btns[k].getAttribute('data-lang') === lang));
+  }
+
+  $('lang').addEventListener('click', function (e) {
+    var btn = e.target.closest ? e.target.closest('button[data-lang]') : null;
+    if (!btn) return;
+    var v = btn.getAttribute('data-lang');
+    if (v === lang) return;
+    lang = v;
+    saveLang(v);
+    render();
+  });
+  window.addEventListener('hashchange', render);
+  render();
+})();
+</script>
+</body>
+</html>

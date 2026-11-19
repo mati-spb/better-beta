@@ -1,0 +1,16 @@
+{
+  "app": "4.6.0",
+  "versionCode": 9,
+  "versionName": "2.6.0",
+  "apkUrl": "https://mati-spb.github.io/better-beta/better.apk",
+  "apk": {
+    "versionCode": 9,
+    "versionName": "2.6.0",
+    "size": 2411428,
+    "sha256": "931f7a92d1fd6843b64890e9d82d706fafec97485af1dfa3f9739c407aa3f13b"
+  },
+  "web": {
+    "version": "4.6.0",
+    "build": "459c4d870e52e5a1"
+  }
+}
